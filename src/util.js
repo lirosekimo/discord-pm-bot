@@ -1,9 +1,11 @@
-// ------- parseDuration：支援 10m / 2h / 1d / 30s / 1h 30m / 90m / 15min / 2hr 等 --------
+// src/util.js
+
+// 強化版 duration：支援 "10m"、"2h"、"1d"、"30s"、"1h 30m"、"90m"、"15min"、"2hr"…（你目前可用的這版保留）
 function parseDuration(input) {
   if (!input) return null;
   const s = String(input).trim().toLowerCase();
   const regex =
-    /(\\d+)\\s*(s|sec|secs|second|seconds|m|min|mins|minute|minutes|h|hr|hrs|hour|hours|d|day|days)/g;
+    /(\d+)\s*(s|sec|secs|second|seconds|m|min|mins|minute|minutes|h|hr|hrs|hour|hours|d|day|days)/g;
   let total = 0,
     m,
     found = false;
@@ -19,21 +21,21 @@ function parseDuration(input) {
       total += n * 3_600_000;
     else if (["d", "day", "days"].includes(u)) total += n * 86_400_000;
   }
-  if (!found && /^\\d+$/.test(s)) {
+  if (!found && /^\d+$/.test(s)) {
     total = Number(s) * 60_000;
     found = true;
   } // 純數字＝分鐘
   return !found || total <= 0 ? null : total;
 }
 
-// ------- parseDateTime：嚴格支援 ASCII 的兩種格式（+容許 '/' 與 'T' 分隔） --------
-// 可用：YYYY-MM-DD、YYYY-MM-DD HH:mm、YYYY/MM/DD、YYYY/MM/DD HH:mm、YYYY-MM-DDTHH:mm
+// 嚴格手動解析：只接受 ASCII 的兩種寫法（+ 允許 '/'、允許中間用 'T'）
+// 例：2025-10-31、2025-10-31 18:00、2025/10/31、2025/10/31T18:00
 function parseDateTime(input) {
   if (input == null) return null;
   let s = String(input).trim();
   if (!s) return null;
 
-  // 容許用 'T' 當日期與時間的分隔
+  // 允許用 'T' 當日期與時間的分隔
   s = s.replace("T", " ");
 
   // 切出日期與（可選的）時間
@@ -49,9 +51,9 @@ function parseDateTime(input) {
   if (!dateSep) return null;
 
   const [yStr, mStr, dStr] = datePart.split(dateSep);
-  if (!/^\\d{4}$/.test(yStr)) return null;
-  if (!/^\\d{1,2}$/.test(mStr)) return null;
-  if (!/^\\d{1,2}$/.test(dStr)) return null;
+  if (!/^\d{4}$/.test(yStr)) return null;
+  if (!/^\d{1,2}$/.test(mStr)) return null;
+  if (!/^\d{1,2}$/.test(dStr)) return null;
 
   const year = Number(yStr);
   const month = Number(mStr);
@@ -69,8 +71,8 @@ function parseDateTime(input) {
     const t = timePart.split(":");
     if (t.length !== 2) return null;
     const [hStr, minStr] = t;
-    if (!/^\\d{1,2}$/.test(hStr)) return null;
-    if (!/^\\d{1,2}$/.test(minStr)) return null;
+    if (!/^\d{1,2}$/.test(hStr)) return null;
+    if (!/^\d{1,2}$/.test(minStr)) return null;
     hour = Number(hStr);
     minute = Number(minStr);
     if (hour < 0 || hour > 23) return null;
