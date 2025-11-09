@@ -1,0 +1,13 @@
+ni .gitignore -Force
+@"
+node_modules/
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env.local
+*.pem
+.pids
+*.log
+"@ | Out-File -FilePath .gitignore -Encoding utf8
